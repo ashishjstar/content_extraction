@@ -2,10 +2,11 @@
 
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.config.settings import Settings, get_settings
+from app.core.exceptions import AppError, NotFoundError
 from app.services.parser import ParserFactory
 from app.services.extraction import TableExtractor, CrossPageTableStitcher, IconExtractor, CaptionExtractor
 from app.services.hierarchy.ast_builder import ASTBuilder
@@ -48,9 +49,9 @@ async def extract_document(
             break
 
     if upload_path is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No uploaded file found for document_id '{request.document_id}'.",
+        raise NotFoundError(
+            f"No uploaded file found for document_id '{request.document_id}'.",
+            code="DOCUMENT_NOT_FOUND",
         )
 
     # ── Parse ───────────────────────────────────────────────────────
@@ -75,11 +76,14 @@ async def extract_document(
         document_node = ast_builder.build(raw_document)
             
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
+        raise AppError(status_code=400, code="BAD_REQUEST", message=str(e)) from e
+    except AppError:
+        raise
+    except Exception:
+        raise AppError(
             status_code=500,
-            detail=f"Extraction failed: {e}",
+            code="EXTRACTION_FAILED",
+            message="Extraction failed.",
         )
 
     # ── Build summary ───────────────────────────────────────────────

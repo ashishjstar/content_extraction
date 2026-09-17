@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request, status
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import APIRouter, Depends, UploadFile, File, Form, Request, status
+from fastapi.responses import FileResponse
 from loguru import logger
 
 from app.config.settings import Settings, get_settings
+from app.core.exceptions import AppError, NotFoundError
 from app.schemas.migration import DocxMigrationOutput
 from app.services.llm.chain_factory import ChainFactory
 from app.services.migration.docx_migrator import DocxMigrator
@@ -58,9 +59,9 @@ def _find_extracted_json(document_id: str, settings: Settings, request: Request)
     if candidates:
         return candidates[0]
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Extracted JSON not found for document_id '{document_id}' in {settings.output_dir}",
+    raise NotFoundError(
+        f"Extracted JSON not found for document_id '{document_id}'.",
+        code="DOCUMENT_NOT_FOUND",
     )
 
 
@@ -119,10 +120,11 @@ async def migrate_document(
         with open(json_path, "r", encoding="utf-8") as f:
             raw_data = json.load(f)
         extracted = DocxMigrationOutput.model_validate(raw_data)
-    except Exception as exc:
-        raise HTTPException(
+    except Exception:
+        raise AppError(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Failed to parse extracted JSON '{json_path.name}': {exc}",
+            code="INVALID_EXTRACTED_JSON",
+            message="Failed to parse extracted JSON.",
         )
 
     # Handle template file
@@ -138,9 +140,10 @@ async def migrate_document(
         if templates:
             target_template_path = templates[0]
         else:
-            raise HTTPException(
+            raise AppError(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No template_file provided and no default .docx found in data/templates/",
+                code="TEMPLATE_NOT_FOUND",
+                message="No template_file provided and no default .docx found in data/templates/",
             )
 
     output_docx_path = settings.migration_output_dir / f"migrated_{document_id}.docx"
@@ -171,11 +174,14 @@ async def migrate_document(
         result.download_url = f"/documents/{document_id}/download-docx"
         return result
 
-    except Exception as exc:
-        logger.exception(f"Migration failed for '{document_id}': {exc}")
-        raise HTTPException(
+    except AppError:
+        raise
+    except Exception:
+        logger.exception("Migration failed for '{}'", document_id)
+        raise AppError(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Migration execution failed: {exc}",
+            code="MIGRATION_FAILED",
+            message="Migration execution failed.",
         )
 
 
@@ -190,9 +196,9 @@ async def get_migration_plan(
         settings.migration_output_dir, "plan_", document_id, ".json", request
     )
     if not plan_path or not plan_path.exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Migration plan not found for document_id '{document_id}'",
+        raise NotFoundError(
+            f"Migration plan not found for document_id '{document_id}'",
+            code="MIGRATION_PLAN_NOT_FOUND",
         )
 
     with open(plan_path, "r", encoding="utf-8") as f:
@@ -210,9 +216,9 @@ async def get_migration_status(
         settings.migration_output_dir, "qa_", document_id, ".json", request
     )
     if not qa_path or not qa_path.exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"QA report not found for document_id '{document_id}'",
+        raise NotFoundError(
+            f"QA report not found for document_id '{document_id}'",
+            code="MIGRATION_QA_NOT_FOUND",
         )
 
     with open(qa_path, "r", encoding="utf-8") as f:
@@ -230,9 +236,9 @@ async def download_migrated_docx(
         settings.migration_output_dir, "migrated_", document_id, ".docx", request
     )
     if not docx_path or not docx_path.exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Migrated .docx not found for document_id '{document_id}'",
+        raise NotFoundError(
+            f"Migrated .docx not found for document_id '{document_id}'",
+            code="MIGRATED_DOCX_NOT_FOUND",
         )
 
     return FileResponse(

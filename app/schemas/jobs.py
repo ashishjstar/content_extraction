@@ -34,6 +34,9 @@ class BatchJob(BaseModel):
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     documents: list[DocumentJob] = Field(default_factory=list)
+    user_id: Optional[str] = None
+    user_email: Optional[str] = None
+    correlation_id: Optional[str] = None
     
     @property
     def total_documents(self) -> int:

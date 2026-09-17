@@ -25,7 +25,7 @@
   "blue_text_remaining": 0,
   "heading_style_issues": [],
   "low_confidence_warnings": [
-    "No content sections were provided in the CONTENT_SUMMARY, resulting in no source content mapping."
+    "No source content sections were provided, resulting in default fallback actions for all template sections."
   ],
   "validation_errors": [],
   "recommendations": [],

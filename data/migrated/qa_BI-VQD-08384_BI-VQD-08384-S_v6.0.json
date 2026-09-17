@@ -1,8 +1,8 @@
 {
   "status": "pass_with_warnings",
   "total_source_sections": 9,
-  "total_source_elements": 76,
-  "total_placed_elements": 76,
+  "total_source_elements": 161,
+  "total_placed_elements": 161,
   "total_skipped_elements": 0,
   "content_coverage_pct": 100.0,
   "sections_mapped": 9,
@@ -14,7 +14,7 @@
   "blue_text_remaining": 0,
   "heading_style_issues": [],
   "low_confidence_warnings": [
-    "Some sections had ambiguous mappings due to similar headings."
+    "Some sections required manual interpretation for mapping due to lack of direct matches."
   ],
   "validation_errors": [],
   "recommendations": [],

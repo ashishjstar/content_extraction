@@ -1,8 +1,9 @@
 """Endpoints for polling and streaming job status."""
 
 import asyncio
-from fastapi import APIRouter, Request, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect
 
+from app.core.exceptions import NotFoundError
 from app.schemas.jobs import BatchJob
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -14,7 +15,7 @@ async def get_job_status(job_id: str, request: Request):
     job_manager = request.app.state.job_manager
     job = job_manager.get_job(job_id)
     if not job:
-        raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+        raise NotFoundError(f"Job {job_id} not found", code="JOB_NOT_FOUND")
     return job
 
 

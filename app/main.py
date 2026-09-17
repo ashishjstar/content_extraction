@@ -4,14 +4,15 @@ Run with:  uvicorn app.main:app --reload
 """
 
 from contextlib import asynccontextmanager
-from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from loguru import logger
 
 from app.config.settings import get_settings
+from app.core.exception_handlers import register_exception_handlers
+from app.core.logging_config import setup_logging
+from app.core.logging_middleware import LoggingContextMiddleware
 from app.api import health, upload, extract, documents, jobs, migration, sops, review, auth
 from app.services.job_manager import JobManager
 from app.stores.sop_store import SopStore
@@ -22,29 +23,26 @@ from app.stores.auth_store import AuthStore
 async def lifespan(application: FastAPI):
     """Startup / shutdown lifecycle hook."""
     settings = get_settings()
+    setup_logging(settings)
     logger.info(
         "SOP Migration System starting  |  log_level={level}  |  upload_dir={dir}",
         level=settings.log_level,
         dir=settings.upload_dir,
     )
     settings.ensure_directories()
-    
-    # Initialize SopStore
+
     sop_db_path = settings.project_root / "data" / "sop_records.db"
     sop_store = SopStore(sop_db_path, settings)
     application.state.sop_store = sop_store
 
-    # Initialize AuthStore
     auth_db_path = settings.auth_db_path or (settings.project_root / "data" / "auth.db")
     auth_store = AuthStore(auth_db_path, settings)
     application.state.auth_store = auth_store
 
-    # Initialize JobManager
     job_manager = JobManager(settings, concurrency=1, sop_store=sop_store)
     application.state.job_manager = job_manager
     await job_manager.start()
 
-    # Initialize ChainFactory
     from app.services.llm.chain_factory import ChainFactory
     chain_factory = ChainFactory(settings)
     application.state.chain_factory = chain_factory
@@ -53,6 +51,8 @@ async def lifespan(application: FastAPI):
 
     logger.info("SOP Migration System shutting down.")
     await job_manager.stop()
+    from app.core.logging_config import reset_logging_state
+    reset_logging_state()
 
 
 app = FastAPI(
@@ -66,7 +66,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ── CORS Middleware ─────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"],
@@ -75,23 +74,9 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["X-Request-ID", "X-Correlation-ID", "Idempotency-Key", "Authorization"],
 )
+app.add_middleware(LoggingContextMiddleware)
+register_exception_handlers(app)
 
-
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """Catch-all for unhandled server errors (e.g. document parsing crashes)."""
-    logger.exception(f"Unhandled error processing request {request.url}: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": "Internal Server Error",
-            "message": str(exc),
-            "path": str(request.url.path),
-        },
-    )
-
-
-# ── Register routers ────────────────────────────────────────────────────
 app.include_router(health.router)
 app.include_router(upload.router)
 app.include_router(extract.router)

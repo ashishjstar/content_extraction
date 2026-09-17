@@ -149,8 +149,12 @@ async def upload_documents_batch(
             detail="No valid files were uploaded in the batch."
         )
 
-    # Enqueue the job
     job_manager = request.app.state.job_manager
-    job = job_manager.create_batch_job(document_ids)
+    job = job_manager.create_batch_job(
+        document_ids,
+        user_id=getattr(request.state, "user_id", None),
+        user_email=getattr(request.state, "user_email", None),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
     
     return job
