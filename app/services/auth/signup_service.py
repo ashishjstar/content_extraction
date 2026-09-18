@@ -7,6 +7,7 @@ from loguru import logger
 
 from app.config.settings import Settings
 from app.stores.auth_store import AuthStore
+from app.core.exceptions import AppError
 from app.schemas.auth import (
     SignupRequest,
     SignupSuccessResponse,
@@ -24,14 +25,22 @@ EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 NO_CONTROL_CHARS = re.compile(r"^[^\x00-\x1F\x7F]*$")
 
 
-class SignupError(Exception):
+class SignupError(AppError):
     """Base exception for signup flow errors."""
-    def __init__(self, status_code: int, code: str, message: str, field_errors: Optional[list[ApiFieldError]] = None):
-        super().__init__(message)
-        self.status_code = status_code
-        self.code = code
-        self.message = message
-        self.field_errors = field_errors or []
+
+    def __init__(
+        self,
+        status_code: int,
+        code: str,
+        message: str,
+        field_errors: Optional[list[ApiFieldError]] = None,
+    ):
+        super().__init__(
+            status_code=status_code,
+            code=code,
+            message=message,
+            field_errors=field_errors or [],
+        )
 
 
 class SignupService:

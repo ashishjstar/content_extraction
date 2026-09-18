@@ -1,9 +1,10 @@
 """Review bootstrap and configuration endpoint for Common Review Page."""
 
 from typing import Optional, Any
-from fastapi import APIRouter, HTTPException, Depends, Request, Query
+from fastapi import APIRouter, Depends, Request, Query
 
 from app.config.settings import Settings, get_settings
+from app.core.exceptions import NotFoundError
 
 router = APIRouter(prefix="/review", tags=["Review"])
 
@@ -19,11 +20,11 @@ async def get_review_bootstrap(
     """Return the configuration, layout, and metadata bootstrap for the Common Review Page."""
     sop_store = getattr(request.app.state, "sop_store", None)
     if not sop_store:
-        raise HTTPException(status_code=404, detail="SOP store not initialized")
+        raise NotFoundError("SOP store not initialized", code="SOP_STORE_UNAVAILABLE")
 
     record = sop_store.get_record_by_id(record_id)
     if not record:
-        raise HTTPException(status_code=404, detail=f"SOP record {record_id} not found")
+        raise NotFoundError(f"SOP record {record_id} not found", code="SOP_NOT_FOUND")
 
     w_id = workflow_id or f"{mode[:3]}_{record_id:02d}"
 

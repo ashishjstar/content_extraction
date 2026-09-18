@@ -10,6 +10,7 @@ from typing import Optional
 from loguru import logger
 
 from app.config.settings import Settings
+from app.core.exceptions import AppError
 from app.schemas.jobs import BatchJob, DocumentJob, JobStatus
 from app.schemas.output import DocumentExtractionOutput, ExtractionStats, AssetManifest, AssetReference
 from app.services.parser.parser_factory import ParserFactory
@@ -49,21 +50,32 @@ class JobManager:
         await asyncio.gather(*self.workers, return_exceptions=True)
         self.workers.clear()
 
-    def create_batch_job(self, document_ids: list[str]) -> BatchJob:
+    def create_batch_job(
+        self,
+        document_ids: list[str],
+        user_id: Optional[str] = None,
+        user_email: Optional[str] = None,
+        correlation_id: Optional[str] = None,
+    ) -> BatchJob:
         """Create a new batch job and queue its documents."""
         job_id = str(uuid.uuid4())
         docs = []
         for did in document_ids:
             doc = DocumentJob(document_id=did, filename=f"{did}")
             docs.append(doc)
-            
-        job = BatchJob(job_id=job_id, documents=docs)
+
+        job = BatchJob(
+            job_id=job_id,
+            documents=docs,
+            user_id=user_id,
+            user_email=user_email,
+            correlation_id=correlation_id,
+        )
         self.jobs[job_id] = job
-        
-        # Enqueue each document
+
         for doc in docs:
             self.queue.put_nowait((job_id, doc.document_id))
-            
+
         return job
         
     def get_job(self, job_id: str) -> Optional[BatchJob]:
@@ -79,8 +91,8 @@ class JobManager:
                 self.queue.task_done()
             except asyncio.CancelledError:
                 break
-            except Exception as e:
-                logger.error(f"Worker {name} encountered error: {e}")
+            except Exception:
+                logger.exception("Worker {} encountered error", name)
 
     async def _process_document(self, job_id: str, document_id: str):
         """Process a single document through the extraction pipeline."""
@@ -100,106 +112,117 @@ class JobManager:
             job.started_at = datetime.utcnow()
             
         try:
-            # 1. Locate file
-            upload_path = None
-            for ext in self.settings.allowed_extensions:
-                candidate = self.settings.upload_dir / f"{document_id}{ext}"
-                if candidate.exists():
-                    upload_path = candidate
-                    break
-                    
-            if not upload_path:
-                raise FileNotFoundError(f"File for document {document_id} not found.")
-                
-            doc_job.filename = upload_path.name
-            doc_job.progress_percentage = 20
-            
-            # 2. Parse
-            doc_job.message = "Parsing document..."
-            factory = ParserFactory(settings=self.settings)
-            parser = factory.get_parser(str(upload_path))
-            # In a real async environment we might run this in a threadpool if it's blocking
-            raw_document = await asyncio.to_thread(parser.parse, str(upload_path), document_id=document_id)
-            doc_job.progress_percentage = 40
-            
-            # 3. Extraction
-            doc_job.message = "Running extraction pipeline..."
-            table_ext = TableExtractor(settings=self.settings)
-            stitch_ext = CrossPageTableStitcher(settings=self.settings)
-            icon_ext = IconExtractor(settings=self.settings)
-            caption_ext = CaptionExtractor(settings=self.settings)
-
-            raw_document = await asyncio.to_thread(table_ext.extract, raw_document)
-            raw_document = await asyncio.to_thread(stitch_ext.extract, raw_document)
-            raw_document = await asyncio.to_thread(icon_ext.extract, raw_document, document_id=document_id)
-            raw_document = await asyncio.to_thread(caption_ext.extract, raw_document)
-            doc_job.progress_percentage = 65
-            
-            # 4. AST Build
-            doc_job.message = "Building Abstract Syntax Tree..."
-            ast_builder = ASTBuilder(settings=self.settings)
-            ast = await asyncio.to_thread(ast_builder.build, raw_document)
-            doc_job.progress_percentage = 80
-
-            # 5. Chunking
-            doc_job.message = "Generating hierarchical and semantic chunks..."
-            hierarchical_chunker = HierarchicalChunker(settings=self.settings)
-            semantic_chunker = SemanticChunker(settings=self.settings)
-            chunks = await asyncio.to_thread(hierarchical_chunker.chunk, ast)
-            chunks = await asyncio.to_thread(semantic_chunker.chunk, chunks)
-            doc_job.progress_percentage = 90
-            
-            # 6. Output packaging
-            doc_job.message = "Finalizing output..."
-            assets_manifest = self._build_asset_manifest(document_id, ast)
-            migration_output = MigrationExporter.export(
+            with logger.contextualize(
+                job_id=job_id,
                 document_id=document_id,
-                ast=ast,
-                assets_manifest=assets_manifest,
-            )
-            
-            # Save to disk
-            output_dir = self.settings.output_dir
-            output_dir.mkdir(parents=True, exist_ok=True)
-            out_file = output_dir / f"{document_id}_v2.json"
-            
-            # Write to disk using clean dictionary serialization without null/empty noise
-            clean_json = json.dumps(migration_output.to_clean_dict(), indent=2, ensure_ascii=False)
-            await asyncio.to_thread(out_file.write_text, clean_json, encoding="utf-8")
+                user_id=job.user_id,
+                user_email=job.user_email,
+                correlation_id=job.correlation_id,
+                stage="parse",
+            ):
+                # 1. Locate file
+                upload_path = None
+                for ext in self.settings.allowed_extensions:
+                    candidate = self.settings.upload_dir / f"{document_id}{ext}"
+                    if candidate.exists():
+                        upload_path = candidate
+                        break
 
-            # Upsert into sop_store if available
-            if self.sop_store:
-                try:
-                    meta = migration_output.metadata
-                    await asyncio.to_thread(
-                        self.sop_store.upsert_record,
-                        job_id=job_id,
-                        document_uid=document_id,
-                        document_number=getattr(meta, "document_number", None),
-                        document_name=getattr(meta, "document_name", None),
-                        document_title=getattr(meta, "document_title", None),
-                        document_version=getattr(meta, "document_version", None),
-                        document_type=getattr(meta, "document_type", None),
-                        file_type=getattr(meta, "file_type", "pdf"),
-                        language=getattr(meta, "language", "en") or "en",
-                        page_count=getattr(meta, "page_count", 0) or 0,
-                        source_filename=upload_path.name if upload_path else None,
-                        output_path=str(out_file),
-                        status="in_review",
+                if not upload_path:
+                    raise FileNotFoundError(f"File for document {document_id} not found.")
+
+                doc_job.filename = upload_path.name
+                doc_job.progress_percentage = 20
+
+                # 2. Parse
+                doc_job.message = "Parsing document..."
+                factory = ParserFactory(settings=self.settings)
+                parser = factory.get_parser(str(upload_path))
+                raw_document = await asyncio.to_thread(parser.parse, str(upload_path), document_id=document_id)
+                doc_job.progress_percentage = 40
+
+                # 3. Extraction
+                doc_job.message = "Running extraction pipeline..."
+                table_ext = TableExtractor(settings=self.settings)
+                stitch_ext = CrossPageTableStitcher(settings=self.settings)
+                icon_ext = IconExtractor(settings=self.settings)
+                caption_ext = CaptionExtractor(settings=self.settings)
+
+                with logger.contextualize(stage="tables"):
+                    raw_document = await asyncio.to_thread(table_ext.extract, raw_document)
+                    raw_document = await asyncio.to_thread(stitch_ext.extract, raw_document)
+
+                with logger.contextualize(stage="icons"):
+                    raw_document = await asyncio.to_thread(icon_ext.extract, raw_document, document_id=document_id)
+                    raw_document = await asyncio.to_thread(caption_ext.extract, raw_document)
+                doc_job.progress_percentage = 65
+
+                # 4. AST Build
+                doc_job.message = "Building Abstract Syntax Tree..."
+                ast_builder = ASTBuilder(settings=self.settings)
+                with logger.contextualize(stage="ast"):
+                    ast = await asyncio.to_thread(ast_builder.build, raw_document)
+                doc_job.progress_percentage = 80
+
+                # 5. Chunking
+                doc_job.message = "Generating hierarchical and semantic chunks..."
+                hierarchical_chunker = HierarchicalChunker(settings=self.settings)
+                semantic_chunker = SemanticChunker(settings=self.settings)
+                with logger.contextualize(stage="chunk"):
+                    chunks = await asyncio.to_thread(hierarchical_chunker.chunk, ast)
+                    chunks = await asyncio.to_thread(semantic_chunker.chunk, chunks)
+                doc_job.progress_percentage = 90
+
+                # 6. Output packaging
+                doc_job.message = "Finalizing output..."
+                with logger.contextualize(stage="export"):
+                    assets_manifest = self._build_asset_manifest(document_id, ast)
+                    migration_output = MigrationExporter.export(
+                        document_id=document_id,
+                        ast=ast,
+                        assets_manifest=assets_manifest,
                     )
-                except Exception as store_err:
-                    logger.warning(f"Failed to upsert SOP record for {document_id}: {store_err}")
-            
+
+                    output_dir = self.settings.output_dir
+                    output_dir.mkdir(parents=True, exist_ok=True)
+                    out_file = output_dir / f"{document_id}_v2.json"
+
+                    clean_json = json.dumps(migration_output.to_clean_dict(), indent=2, ensure_ascii=False)
+                    await asyncio.to_thread(out_file.write_text, clean_json, encoding="utf-8")
+
+                    if self.sop_store:
+                        try:
+                            meta = migration_output.metadata
+                            await asyncio.to_thread(
+                                self.sop_store.upsert_record,
+                                job_id=job_id,
+                                document_uid=document_id,
+                                document_number=getattr(meta, "document_number", None),
+                                document_name=getattr(meta, "document_name", None),
+                                document_title=getattr(meta, "document_title", None),
+                                document_version=getattr(meta, "document_version", None),
+                                document_type=getattr(meta, "document_type", None),
+                                file_type=getattr(meta, "file_type", "pdf"),
+                                language=getattr(meta, "language", "en") or "en",
+                                page_count=getattr(meta, "page_count", 0) or 0,
+                                source_filename=upload_path.name if upload_path else None,
+                                output_path=str(out_file),
+                                status="in_review",
+                            )
+                        except Exception as store_err:
+                            logger.warning(f"Failed to upsert SOP record for {document_id}: {store_err}")
+
             doc_job.status = JobStatus.COMPLETED
             doc_job.progress_percentage = 100
             doc_job.message = "Successfully extracted document."
             doc_job.completed_at = datetime.utcnow()
-            
+
         except Exception as e:
-            logger.exception(f"Job {job_id} failed on doc {document_id}: {e}")
+            logger.exception(f"Job {job_id} failed on doc {document_id}")
+            safe = e.message if isinstance(e, AppError) else "Extraction failed"
             doc_job.status = JobStatus.FAILED
-            doc_job.error = str(e)
-            doc_job.message = f"Failed: {str(e)}"
+            doc_job.error = safe
+            doc_job.message = f"Failed: {safe}"
             doc_job.completed_at = datetime.utcnow()
             
         # Check if entire batch is complete

@@ -2,9 +2,9 @@
 
 from typing import Optional, Any
 from pydantic import BaseModel
-from fastapi import APIRouter, HTTPException, Depends, Request, Query
+from fastapi import APIRouter, Request, Query
 
-from app.config.settings import Settings, get_settings
+from app.core.exceptions import AppError, NotFoundError
 
 router = APIRouter(prefix="/sops", tags=["SOPs"])
 
@@ -36,10 +36,10 @@ async def get_sop_record(
     """Retrieve a single SOP record by its ID."""
     sop_store = getattr(request.app.state, "sop_store", None)
     if not sop_store:
-        raise HTTPException(status_code=404, detail="SOP store not initialized")
+        raise NotFoundError("SOP store not initialized", code="SOP_STORE_UNAVAILABLE")
     record = sop_store.get_record_by_id(record_id)
     if not record:
-        raise HTTPException(status_code=404, detail=f"SOP record {record_id} not found")
+        raise NotFoundError(f"SOP record {record_id} not found", code="SOP_NOT_FOUND")
     return record
 
 
@@ -51,15 +51,19 @@ async def update_sop_status(
 ) -> dict[str, Any]:
     """Update the review status of an SOP record."""
     if body.status not in ("in_review", "approved", "rejected"):
-        raise HTTPException(status_code=400, detail="Invalid status. Must be in_review, approved, or rejected.")
+        raise AppError(
+            status_code=400,
+            code="INVALID_STATUS",
+            message="Invalid status. Must be in_review, approved, or rejected.",
+        )
 
     sop_store = getattr(request.app.state, "sop_store", None)
     if not sop_store:
-        raise HTTPException(status_code=404, detail="SOP store not initialized")
+        raise NotFoundError("SOP store not initialized", code="SOP_STORE_UNAVAILABLE")
 
     updated = sop_store.update_status(record_id, body.status)
     if not updated:
-        raise HTTPException(status_code=404, detail=f"SOP record {record_id} not found")
+        raise NotFoundError(f"SOP record {record_id} not found", code="SOP_NOT_FOUND")
     return updated
 
 
@@ -71,9 +75,9 @@ async def delete_sop_record(
     """Delete an SOP record with smart cleanup of underlying files."""
     sop_store = getattr(request.app.state, "sop_store", None)
     if not sop_store:
-        raise HTTPException(status_code=404, detail="SOP store not initialized")
+        raise NotFoundError("SOP store not initialized", code="SOP_STORE_UNAVAILABLE")
 
     deleted = sop_store.delete_record(record_id)
     if not deleted:
-        raise HTTPException(status_code=404, detail=f"SOP record {record_id} not found")
+        raise NotFoundError(f"SOP record {record_id} not found", code="SOP_NOT_FOUND")
     return {"message": f"SOP record {record_id} deleted successfully."}

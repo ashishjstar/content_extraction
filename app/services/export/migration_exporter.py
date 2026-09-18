@@ -7,9 +7,10 @@ specifically for reconstructing Microsoft Word (.docx) documents.
 
 from __future__ import annotations
 
-import logging
 import re
 from typing import Optional, Any
+
+from loguru import logger
 
 from app.schemas.ast_nodes import (
     DocumentNode,
@@ -38,8 +39,6 @@ from app.services.extraction.tables import (
     collapse_sparse_grid,
     clean_table_cell_text,
 )
-
-logger = logging.getLogger(__name__)
 
 
 def _is_major_section_heading(

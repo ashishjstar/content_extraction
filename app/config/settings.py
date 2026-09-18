@@ -50,6 +50,10 @@ class Settings(BaseSettings):
 
     # --- Logging ---
     log_level: str = "INFO"
+    log_dir: Path = Path("data/logs")
+    log_file_path: Path = Path("data/logs/app.log")
+    error_file_path: Path = Path("data/logs/error.log")
+    log_db_path: Path = Path("data/logs/logs.db")
 
     # --- Migration ---
     migration_output_dir: Path = Path("data/migrated")
@@ -112,6 +116,10 @@ class Settings(BaseSettings):
         self.output_dir = base / self.output_dir
         self.migration_output_dir = base / self.migration_output_dir
         self.migration_template_dir = base / self.migration_template_dir
+        self.log_dir = base / self.log_dir
+        self.log_file_path = base / self.log_file_path
+        self.error_file_path = base / self.error_file_path
+        self.log_db_path = base / self.log_db_path
 
     def ensure_directories(self) -> None:
         """Create all required data directories if they don't exist."""
@@ -123,6 +131,7 @@ class Settings(BaseSettings):
             self.output_dir,
             self.migration_output_dir,
             self.migration_template_dir,
+            self.log_dir,
         ]:
             dir_path.mkdir(parents=True, exist_ok=True)
 

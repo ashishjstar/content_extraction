@@ -82,7 +82,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     } catch {
       errData = { message: res.statusText };
     }
-    const message = errData?.detail || errData?.message || `HTTP ${res.status}: ${res.statusText}`;
+    const message =
+      errData?.error?.message ||
+      errData?.error?.code ||
+      errData?.detail ||
+      errData?.message ||
+      `HTTP ${res.status}: ${res.statusText}`;
     throw new ApiError(message, res.status, errData);
   }
 

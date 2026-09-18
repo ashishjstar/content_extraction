@@ -4,9 +4,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 
 from app.config.settings import Settings, get_settings
+from app.core.exceptions import AppError, NotFoundError
 from app.services.parser import ParserFactory
 from app.services.extraction import TableExtractor, CrossPageTableStitcher, IconExtractor, CaptionExtractor
 from app.services.hierarchy.ast_builder import ASTBuilder
@@ -213,17 +214,18 @@ async def get_document_json_v2(
     output_path = output_dir / f"{document_id}_v2.json"
     
     if not output_path.exists():
-        raise HTTPException(
-            status_code=404,
-            detail=f"v2 JSON for document '{document_id}' not found. Did the job complete?",
+        raise NotFoundError(
+            f"v2 JSON for document '{document_id}' not found. Did the job complete?",
+            code="DOCUMENT_JSON_NOT_FOUND",
         )
 
     try:
         data = json.loads(output_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as e:
-        raise HTTPException(
+    except (OSError, json.JSONDecodeError):
+        raise AppError(
             status_code=422,
-            detail=f"Stored v2 JSON for '{document_id}' could not be read: {e}",
+            code="INVALID_EXTRACTED_JSON",
+            message="Stored v2 JSON could not be read.",
         )
 
     return _rewrite_asset_paths(data, document_id)
@@ -261,7 +263,10 @@ async def get_document_asset(
     if icon_path.exists() and icon_path.is_file():
         return FileResponse(path=str(icon_path), media_type="image/png")
 
-    raise HTTPException(status_code=404, detail=f"Asset '{safe_name}' not found for document '{document_id}'")
+    raise NotFoundError(
+        f"Asset '{safe_name}' not found for document '{document_id}'",
+        code="ASSET_NOT_FOUND",
+    )
 
 
 # ── Helper ──────────────────────────────────────────────────────────────
@@ -295,7 +300,7 @@ def _find_upload(document_id: str, settings: Settings) -> Path:
         if candidate.exists():
             return candidate
 
-    raise HTTPException(
-        status_code=404,
-        detail=f"No uploaded file found for document_id '{document_id}'.",
+    raise NotFoundError(
+        f"No uploaded file found for document_id '{document_id}'.",
+        code="DOCUMENT_NOT_FOUND",
     )

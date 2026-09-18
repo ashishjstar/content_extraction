@@ -18,6 +18,7 @@ from app.config.settings import Settings
 from app.stores.auth_store import AuthStore
 from app.services.auth.password_service import PasswordService
 from app.services.auth.token_service import TokenService
+from app.core.exceptions import AppError
 from app.schemas.auth import (
     LoginRequest,
     LoginSuccessResponse,
@@ -29,7 +30,7 @@ from app.schemas.auth import (
 )
 
 
-class LoginError(Exception):
+class LoginError(AppError):
     """Exception raised for domain-level login and session failures."""
 
     def __init__(
@@ -39,13 +40,16 @@ class LoginError(Exception):
         message: str,
         field_errors: Optional[list[ApiFieldError]] = None,
         retry_after: Optional[int] = None,
+        clear_refresh_cookie: bool = False,
     ):
-        super().__init__(message)
-        self.status_code = status_code
-        self.code = code
-        self.message = message
-        self.field_errors = field_errors
-        self.retry_after = retry_after
+        super().__init__(
+            status_code=status_code,
+            code=code,
+            message=message,
+            field_errors=field_errors,
+            retry_after=retry_after,
+            clear_refresh_cookie=clear_refresh_cookie,
+        )
 
 
 EMAIL_REGEX = re.compile(
@@ -428,6 +432,7 @@ class LoginService:
                 status_code=401,
                 code="INVALID_CREDENTIALS",
                 message="Refresh token is missing.",
+                clear_refresh_cookie=True,
             )
 
         token_hash = hashlib.sha256(raw_refresh_token.encode("utf-8")).hexdigest()
@@ -438,6 +443,7 @@ class LoginService:
                 status_code=401,
                 code="INVALID_CREDENTIALS",
                 message="Invalid refresh token session.",
+                clear_refresh_cookie=True,
             )
 
         # Token reuse detection
@@ -465,6 +471,7 @@ class LoginService:
                 status_code=401,
                 code="SESSION_REVOKED",
                 message="Session invalidation: token reuse detected. Please log in again.",
+                clear_refresh_cookie=True,
             )
 
         # Check session expiry
@@ -475,12 +482,14 @@ class LoginService:
                     status_code=401,
                     code="SESSION_EXPIRED",
                     message="Your session has expired. Please log in again.",
+                    clear_refresh_cookie=True,
                 )
         except (ValueError, TypeError):
             raise LoginError(
                 status_code=401,
                 code="SESSION_EXPIRED",
                 message="Your session has expired. Please log in again.",
+                clear_refresh_cookie=True,
             )
 
         # Verify user & role status
@@ -489,12 +498,14 @@ class LoginService:
                 status_code=403,
                 code="ACCOUNT_DISABLED",
                 message="This account is disabled.",
+                clear_refresh_cookie=True,
             )
         if not session.get("roleIsActive"):
             raise LoginError(
                 status_code=403,
                 code="ROLE_INACTIVE",
                 message="Account role is inactive.",
+                clear_refresh_cookie=True,
             )
 
         # Rotate session

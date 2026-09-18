@@ -1,6 +1,6 @@
 {
   "template_name": "upload_Template Main GP Docs.docx",
-  "document_type_detected": "STANDARD OPERATING PROCEDURE",
+  "document_type_detected": "Governance and Procedure > Standard Operating Procedure (SOP)",
   "font_family": "Arial",
   "font_size_body_pt": 10.0,
   "font_size_heading1_pt": 12.0,
@@ -31,8 +31,8 @@
           "callout_background_hex": null,
           "callout_border_hex": null,
           "target_table_index": null,
-          "embed_icons_inline": false,
-          "notes": "Mapped paragraph content to PURPOSE section."
+          "embed_icons_inline": true,
+          "notes": "Mapped paragraph content from source section."
         },
         {
           "source_section_title": "1 PURPOSE",
@@ -47,8 +47,8 @@
           "callout_background_hex": null,
           "callout_border_hex": null,
           "target_table_index": null,
-          "embed_icons_inline": false,
-          "notes": "Mapped paragraph content to PURPOSE section."
+          "embed_icons_inline": true,
+          "notes": "Mapped paragraph content from source section."
         }
       ],
       "has_source_content": true,
@@ -62,11 +62,11 @@
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
       "source_sections_mapped": [
-        "2 SCOPE"
+        "2 APPLICABILITY"
       ],
       "elements": [
         {
-          "source_section_title": "2 SCOPE",
+          "source_section_title": "2 APPLICABILITY",
           "source_element_index": 0,
           "source_element_type": "paragraph",
           "target_section_heading": "APPLICABILITY",
@@ -78,11 +78,11 @@
           "callout_background_hex": null,
           "callout_border_hex": null,
           "target_table_index": null,
-          "embed_icons_inline": false,
-          "notes": "Mapped paragraph content to APPLICABILITY section."
+          "embed_icons_inline": true,
+          "notes": "Mapped paragraph content from source section."
         },
         {
-          "source_section_title": "2 SCOPE",
+          "source_section_title": "2 APPLICABILITY",
           "source_element_index": 1,
           "source_element_type": "paragraph",
           "target_section_heading": "APPLICABILITY",
@@ -94,8 +94,24 @@
           "callout_background_hex": null,
           "callout_border_hex": null,
           "target_table_index": null,
-          "embed_icons_inline": false,
-          "notes": "Mapped paragraph content to APPLICABILITY section."
+          "embed_icons_inline": true,
+          "notes": "Mapped paragraph content from source section."
+        },
+        {
+          "source_section_title": "2 APPLICABILITY",
+          "source_element_index": 2,
+          "source_element_type": "paragraph",
+          "target_section_heading": "APPLICABILITY",
+          "placement_order": 2,
+          "action": "insert_paragraph",
+          "heading_level": null,
+          "heading_style": null,
+          "callout_type": null,
+          "callout_background_hex": null,
+          "callout_border_hex": null,
+          "target_table_index": null,
+          "embed_icons_inline": true,
+          "notes": "Mapped paragraph content from source section."
         }
       ],
       "has_source_content": true,
@@ -109,73 +125,9 @@
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
       "source_sections_mapped": [
-        "6 DEFINITIONS, ACRONYMS AND ABBREVIATIONS"
+        "3 DEFINITIONS & ABBREVIATIONS"
       ],
-      "elements": [
-        {
-          "source_section_title": "6 DEFINITIONS, ACRONYMS AND ABBREVIATIONS",
-          "source_element_index": 0,
-          "source_element_type": "heading",
-          "target_section_heading": "DEFINITIONS & ABBREVIATIONS",
-          "placement_order": 0,
-          "action": "insert_heading",
-          "heading_level": 2,
-          "heading_style": null,
-          "callout_type": null,
-          "callout_background_hex": null,
-          "callout_border_hex": null,
-          "target_table_index": null,
-          "embed_icons_inline": false,
-          "notes": "Mapped heading content to DEFINITIONS & ABBREVIATIONS section."
-        },
-        {
-          "source_section_title": "6 DEFINITIONS, ACRONYMS AND ABBREVIATIONS",
-          "source_element_index": 1,
-          "source_element_type": "table",
-          "target_section_heading": "DEFINITIONS & ABBREVIATIONS",
-          "placement_order": 1,
-          "action": "insert_table",
-          "heading_level": null,
-          "heading_style": null,
-          "callout_type": null,
-          "callout_background_hex": null,
-          "callout_border_hex": null,
-          "target_table_index": null,
-          "embed_icons_inline": false,
-          "notes": "Mapped table content to DEFINITIONS & ABBREVIATIONS section."
-        }
-      ],
-      "has_source_content": true,
-      "fallback_action": null,
-      "fallback_text": null,
-      "is_unmapped_source": false,
-      "insertion_after_section": null
-    },
-    {
-      "template_section_heading": "DOCUMENT HISTORY",
-      "template_heading_level": 1,
-      "template_paragraph_indices_to_delete": [],
-      "source_sections_mapped": [
-        "8 DOCUMENT HISTORY"
-      ],
-      "elements": [
-        {
-          "source_section_title": "8 DOCUMENT HISTORY",
-          "source_element_index": 0,
-          "source_element_type": "table",
-          "target_section_heading": "DOCUMENT HISTORY",
-          "placement_order": 0,
-          "action": "populate_placeholder",
-          "heading_level": null,
-          "heading_style": null,
-          "callout_type": null,
-          "callout_background_hex": null,
-          "callout_border_hex": null,
-          "target_table_index": 16,
-          "embed_icons_inline": false,
-          "notes": "Mapped document history table to DOCUMENT HISTORY section."
-        }
-      ],
+      "elements": [],
       "has_source_content": true,
       "fallback_action": null,
       "fallback_text": null,
@@ -187,7 +139,7 @@
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
       "source_sections_mapped": [
-        "3 IMPLEMENTATION AND/OR PRE-REQUISITES"
+        "4 IMPLEMENTATION AND/OR PRE-REQUISITES"
       ],
       "elements": [],
       "has_source_content": true,
@@ -201,7 +153,7 @@
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
       "source_sections_mapped": [
-        "4 ROLES & RESPONSIBILITIES"
+        "5 ROLES & RESPONSIBILITIES"
       ],
       "elements": [],
       "has_source_content": true,
@@ -214,9 +166,11 @@
       "template_section_heading": "PROCESS",
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
-      "source_sections_mapped": [],
+      "source_sections_mapped": [
+        "6 PROCESS"
+      ],
       "elements": [],
-      "has_source_content": false,
+      "has_source_content": true,
       "fallback_action": null,
       "fallback_text": null,
       "is_unmapped_source": false,
@@ -226,9 +180,11 @@
       "template_section_heading": "ASSOCIATED DOCUMENTS",
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
-      "source_sections_mapped": [],
+      "source_sections_mapped": [
+        "7 ASSOCIATED DOCUMENTS"
+      ],
       "elements": [],
-      "has_source_content": false,
+      "has_source_content": true,
       "fallback_action": null,
       "fallback_text": null,
       "is_unmapped_source": false,
@@ -238,9 +194,11 @@
       "template_section_heading": "REFERENCES",
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
-      "source_sections_mapped": [],
+      "source_sections_mapped": [
+        "8 REFERENCES"
+      ],
       "elements": [],
-      "has_source_content": false,
+      "has_source_content": true,
       "fallback_action": null,
       "fallback_text": null,
       "is_unmapped_source": false,
@@ -259,72 +217,45 @@
       "insertion_after_section": null
     },
     {
-      "template_section_heading": "5 PROCEDURE",
+      "template_section_heading": "DOCUMENT HISTORY",
       "template_heading_level": 1,
       "template_paragraph_indices_to_delete": [],
       "source_sections_mapped": [
-        "5 PROCEDURE"
+        "9 DOCUMENT HISTORY"
       ],
       "elements": [],
       "has_source_content": true,
       "fallback_action": null,
       "fallback_text": null,
-      "is_unmapped_source": true,
-      "insertion_after_section": "PROCESS"
-    },
-    {
-      "template_section_heading": "7 REFERENCE DOCUMENTS",
-      "template_heading_level": 1,
-      "template_paragraph_indices_to_delete": [],
-      "source_sections_mapped": [
-        "7 REFERENCE DOCUMENTS"
-      ],
-      "elements": [],
-      "has_source_content": true,
-      "fallback_action": null,
-      "fallback_text": null,
-      "is_unmapped_source": true,
-      "insertion_after_section": "PROCESS"
+      "is_unmapped_source": false,
+      "insertion_after_section": null
     }
   ],
   "placeholder_tables": [
     {
-      "table_index": 0,
-      "table_purpose": "Scope and metadata",
-      "parent_section_heading": "GENERAL INFORMATION",
-      "action": "delete",
-      "source_section_title": null,
+      "table_index": 2,
+      "table_purpose": "Instructional content for PURPOSE section",
+      "parent_section_heading": "PURPOSE",
+      "action": "populate_placeholder",
+      "source_section_title": "1 PURPOSE",
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Vault token table, not to be populated."
+      "population_notes": "Populate with summarized content from the PURPOSE section."
     },
     {
-      "table_index": 1,
-      "table_purpose": "Applicability and impacted divisions",
+      "table_index": 3,
+      "table_purpose": "Instructional content for APPLICABILITY section",
       "parent_section_heading": "APPLICABILITY",
-      "action": "delete",
-      "source_section_title": null,
+      "action": "populate_placeholder",
+      "source_section_title": "2 APPLICABILITY",
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Vault token table, not to be populated."
-    },
-    {
-      "table_index": 16,
-      "table_purpose": "Document history",
-      "parent_section_heading": "DOCUMENT HISTORY",
-      "action": "populate",
-      "source_section_title": "8 DOCUMENT HISTORY",
-      "source_element_index": 0,
-      "column_mapping": null,
-      "sort_alphabetically": false,
-      "population_notes": "Mapped document history table to DOCUMENT HISTORY section."
+      "population_notes": "Populate with summarized content from the APPLICABILITY section."
     }
   ],
   "tables_to_delete": [
-    2,
-    3,
     4,
     5,
     6,
@@ -342,36 +273,35 @@
     {
       "callout_type": "Executive Summary",
       "display_name": "Executive Summary",
-      "background_color_hex": "#0000FF",
-      "left_border_color_hex": "#0000FF",
+      "background_color_hex": "#0075FF",
+      "left_border_color_hex": "#0056A3",
       "icon_description": "Educational introduction"
     },
     {
       "callout_type": "Explanation",
       "display_name": "Explanation",
       "background_color_hex": "#00FF00",
-      "left_border_color_hex": "#00FF00",
+      "left_border_color_hex": "#007500",
       "icon_description": "Detailed information"
     },
     {
       "callout_type": "Attention",
       "display_name": "Attention",
       "background_color_hex": "#FFC0CB",
-      "left_border_color_hex": "#FFC0CB",
+      "left_border_color_hex": "#FF69B4",
       "icon_description": "Important notice"
     },
     {
       "callout_type": "Key Takeaway",
       "display_name": "Key Takeaway",
       "background_color_hex": "#FFFF00",
-      "left_border_color_hex": "#FFFF00",
+      "left_border_color_hex": "#FFD700",
       "icon_description": "Main learning points"
     }
   ],
   "overall_confidence": 0.95,
   "warnings": [
-    "Some sections were not directly mapped due to lack of clear corresponding template sections.",
-    "Certain subsections were integrated into their parent sections as per the rules."
+    "Some sections required manual interpretation for mapping due to lack of direct matches."
   ],
-  "reasoning_summary": "The migration plan was created by aligning content sections with template sections based on their titles and semantic purposes. Unmapped sections were placed appropriately, and all content was preserved. Placeholder tables were either populated or marked for deletion based on their purpose and content availability."
+  "reasoning_summary": "The migration plan was developed by carefully analyzing the structure and content of the provided template and source document. Sections were mapped based on their titles and content relevance, ensuring all source content is included in the target template. Placeholder tables were populated with relevant content, and unmapped template sections were handled according to the specified rules."
 }

@@ -39,4 +39,6 @@ def test_upload_invalid_file(tmp_path):
         )
     
     assert response.status_code == 400
-    assert "Unsupported file type" in response.json()["detail"]
+    body = response.json()
+    message = body.get("error", {}).get("message") or body.get("detail") or ""
+    assert "Unsupported file type" in message

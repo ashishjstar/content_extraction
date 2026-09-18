@@ -113,8 +113,8 @@
       "source_sections_mapped": [],
       "elements": [],
       "has_source_content": false,
-      "fallback_action": "insert_none",
-      "fallback_text": "(None)",
+      "fallback_action": "insert_na",
+      "fallback_text": "N/A",
       "is_unmapped_source": false,
       "insertion_after_section": null
     },
@@ -157,8 +157,8 @@
     },
     {
       "table_index": 1,
-      "table_purpose": "Applicability and impacted divisions",
-      "parent_section_heading": "APPLICABILITY",
+      "table_purpose": "Impacted Divisions",
+      "parent_section_heading": "GENERAL INFORMATION",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
@@ -168,168 +168,168 @@
     },
     {
       "table_index": 2,
-      "table_purpose": "Purpose instructional table",
+      "table_purpose": "Purpose Description",
       "parent_section_heading": "PURPOSE",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 3,
-      "table_purpose": "Applicability instructional table",
+      "table_purpose": "Applicability Details",
       "parent_section_heading": "APPLICABILITY",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 4,
-      "table_purpose": "Definitions table",
+      "table_purpose": "Definitions Table",
       "parent_section_heading": "DEFINITIONS & ABBREVIATIONS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
-      "sort_alphabetically": false,
-      "population_notes": "No content available for this table."
+      "sort_alphabetically": true,
+      "population_notes": "No definitions provided in source content."
     },
     {
       "table_index": 5,
-      "table_purpose": "Abbreviations table",
+      "table_purpose": "Abbreviations Table",
       "parent_section_heading": "DEFINITIONS & ABBREVIATIONS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
-      "sort_alphabetically": false,
-      "population_notes": "No content available for this table."
+      "sort_alphabetically": true,
+      "population_notes": "No abbreviations provided in source content."
     },
     {
       "table_index": 6,
-      "table_purpose": "Infographics table",
+      "table_purpose": "Infographics Table",
       "parent_section_heading": "DEFINITIONS & ABBREVIATIONS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "No content available for this table."
+      "population_notes": "No infographics provided in source content."
     },
     {
       "table_index": 7,
-      "table_purpose": "Competence description table",
+      "table_purpose": "Competence Description",
       "parent_section_heading": "ROLES & RESPONSIBILITIES",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 8,
-      "table_purpose": "Roles and responsibilities table",
+      "table_purpose": "Role Responsibilities",
       "parent_section_heading": "ROLES & RESPONSIBILITIES",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 9,
-      "table_purpose": "Process steps table",
+      "table_purpose": "Process Steps",
       "parent_section_heading": "ROLES & RESPONSIBILITIES",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 10,
-      "table_purpose": "Executive summary table",
+      "table_purpose": "Executive Summary",
       "parent_section_heading": "PROCESS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 11,
-      "table_purpose": "Explanation section table",
+      "table_purpose": "Explanation Section",
       "parent_section_heading": "PROCESS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 12,
-      "table_purpose": "Attention section table",
+      "table_purpose": "Attention Section",
       "parent_section_heading": "PROCESS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 13,
-      "table_purpose": "Key-take-away section table",
+      "table_purpose": "Key Takeaway Section",
       "parent_section_heading": "PROCESS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "Instructional table, not to be populated."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 14,
-      "table_purpose": "Associated documents table",
+      "table_purpose": "Associated Documents",
       "parent_section_heading": "ASSOCIATED DOCUMENTS",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "No content available for this table."
+      "population_notes": "Instructional table, no source content available."
     },
     {
       "table_index": 15,
-      "table_purpose": "References table",
+      "table_purpose": "References",
       "parent_section_heading": "REFERENCES",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "No content available for this table."
+      "population_notes": "No references provided in source content."
     },
     {
       "table_index": 16,
-      "table_purpose": "Document history table",
+      "table_purpose": "Document History",
       "parent_section_heading": "DOCUMENT HISTORY",
       "action": "delete",
       "source_section_title": null,
       "source_element_index": null,
       "column_mapping": null,
       "sort_alphabetically": false,
-      "population_notes": "No content available for this table."
+      "population_notes": "No document history provided in source content."
     }
   ],
   "tables_to_delete": [
@@ -346,41 +346,42 @@
     12,
     13,
     14,
-    15
+    15,
+    16
   ],
   "callout_styles": [
     {
       "callout_type": "Executive Summary",
       "display_name": "Executive Summary",
-      "background_color_hex": "#0000FF",
+      "background_color_hex": "#ADD8E6",
       "left_border_color_hex": "#0000FF",
       "icon_description": "Educational introduction"
     },
     {
       "callout_type": "Explanation",
       "display_name": "Explanation",
-      "background_color_hex": "#00FF00",
-      "left_border_color_hex": "#00FF00",
+      "background_color_hex": "#90EE90",
+      "left_border_color_hex": "#008000",
       "icon_description": "Detailed information"
     },
     {
       "callout_type": "Attention",
       "display_name": "Attention",
-      "background_color_hex": "#FFC0CB",
-      "left_border_color_hex": "#FFC0CB",
+      "background_color_hex": "#FFB6C1",
+      "left_border_color_hex": "#FF69B4",
       "icon_description": "Important notice"
     },
     {
       "callout_type": "Key Takeaway",
       "display_name": "Key Takeaway",
-      "background_color_hex": "#FFFF00",
-      "left_border_color_hex": "#FFFF00",
+      "background_color_hex": "#FFFFE0",
+      "left_border_color_hex": "#FFD700",
       "icon_description": "Main learning points"
     }
   ],
   "overall_confidence": 0.95,
   "warnings": [
-    "No content sections were provided in the CONTENT_SUMMARY, resulting in no source content mapping."
+    "No source content sections were provided, resulting in default fallback actions for all template sections."
   ],
-  "reasoning_summary": "The migration plan was created based on the provided TEMPLATE_PROFILE and CONTENT_SUMMARY. Since the CONTENT_SUMMARY lacked sections, the plan focuses on handling unmapped template sections and placeholder tables appropriately."
+  "reasoning_summary": "The migration plan was developed based on the provided template structure and the absence of source content sections. Default actions were applied to ensure the template's integrity and compliance with the provided rules."
 }
